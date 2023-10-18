@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import rabbitConfig from './config/rabbit.config';
 
-const ENV_USERS_FILE_PATH = 'apps/task/.task.env';
+const ENV_TASK_FILE_PATH = 'apps/task/.task.env';
 
 @Module({
   imports: [
@@ -10,7 +10,7 @@ const ENV_USERS_FILE_PATH = 'apps/task/.task.env';
       isGlobal: true,
       cache: true,
       load: [rabbitConfig],
-      envFilePath: ENV_USERS_FILE_PATH
+      envFilePath: ENV_TASK_FILE_PATH
     }),
   ]
 })

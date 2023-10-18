@@ -1,0 +1,34 @@
+version: '1'
+services:
+  taskForce.users.mongodb:
+    image: mongo:4.2
+    container_name: taskForce.users.mongodb
+    restart: always
+    env_file:
+      - .taskForce.users.mongodb.env
+    volumes:
+      - taskForce.users.volume:/data/db
+    networks:
+      - taskForce.users.network
+
+  taskForce.users:
+    container_name: taskForce.users
+    depends_on:
+      - taskForce.users.mongodb
+    restart: always
+    image: taskforce.users:latest
+    env_file:
+      - .taskForce.users.env
+    environment:
+      - NODE_ENV=production
+    ports:
+      - 3333:3333
+    networks:
+      - taskForce.users.network
+
+networks:
+  taskForce.users.network:
+    driver: bridge
+
+volumes:
+  taskForce.users.volume:

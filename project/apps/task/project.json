@@ -16,7 +16,8 @@
         "tsConfig": "apps/task/tsconfig.app.json",
         "assets": ["apps/task/src/assets"],
         "isolatedConfig": true,
-        "webpackConfig": "apps/task/webpack.config.js"
+        "webpackConfig": "apps/task/webpack.config.js",
+        "generatePackageJson": true
       },
       "configurations": {
         "development": {},
@@ -57,6 +58,15 @@
           "ci": true,
           "codeCoverage": true
         }
+      }
+    },
+    "buildImage": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "nx run task:build",
+          "docker build --file ./apps/task/Dockerfile --tag taskforce.task:latest ."
+        ]
       }
     },
     "db:lint": {

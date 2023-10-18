@@ -3,6 +3,7 @@ import * as Joi from 'joi';
 
 const DEFAULT_PORT = 3000;
 const DEFAULT_MONGO_PORT = 27017;
+const DEFAULT_ENVIRONMENT = 'production';
 
 export interface UploaderConfig {
   serveRoot: string;
@@ -22,7 +23,7 @@ export interface UploaderConfig {
 export default registerAs('application', (): UploaderConfig => {
   const config: UploaderConfig = {
     serveRoot: process.env.SERVE_ROOT,
-    environment: process.env.NODE_ENV,
+    environment: process.env.NODE_ENV || DEFAULT_ENVIRONMENT,
     uploadDirectory: process.env.UPLOAD_DIRECTORY_PATH,
     port: parseInt(process.env.POR || DEFAULT_PORT.toString(), 10),
     db: {

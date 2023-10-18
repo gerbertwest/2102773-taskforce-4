@@ -5,6 +5,7 @@ const DEFAULT_PORT = 3000;
 const DEFAULT_MONGO_PORT = 27017;
 const DEFAULT_RABBIT_PORT = 5672;
 const DEFAULT_SMTP_PORT = 25;
+const DEFAULT_ENVIRONMENT = 'production';
 
 export interface NotifyConfig {
   environment: string;
@@ -36,7 +37,7 @@ export interface NotifyConfig {
 
 export default registerAs('application', (): NotifyConfig => {
   const config: NotifyConfig = {
-    environment: process.env.NODE_ENV,
+    environment: process.env.NODE_ENV || DEFAULT_ENVIRONMENT,
     port: parseInt(process.env.PORT || DEFAULT_PORT.toString(), 10),
     db: {
       host: process.env.MONGO_HOST,

@@ -1,0 +1,88 @@
+version: '3.5'
+services:
+  taskForce.notify-rabbitmq:
+    image: rabbitmq:3.11-management
+    container_name: taskForce.notify-rabbitmq
+    ports:
+      - '1088:15672'
+      - '5672:5672'
+    env_file:
+      - .taskForce.notify.rabbit.env
+    networks:
+      - taskForce.task.network
+
+  taskForce.task-postgres:
+    image: postgres:14-alpine
+    container_name: taskForce.task-postgres
+    restart: always
+    env_file:
+      - .taskForce.task.db.env
+    ports:
+      - 5432:5432
+    volumes:
+      - taskForce.task.volume:/var/lib/postgresql/data
+    networks:
+      - taskForce.task.network
+
+  taskForce.task.pgadmin:
+    image: dpage/pgadmin4
+    container_name: taskForce.task-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "keks@htmlacademy.local"
+      PGADMIN_DEFAULT_PASSWORD: "test"
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+    ports:
+      - 8082:80
+    networks:
+      - taskForce.task.network
+
+  taskForce.notify-mongodb:
+    image: mongo:4.2
+    container_name: taskForce.notify-mongodb
+    env_file:
+      - .taskForce.notify.db.env
+    ports:
+      - 27017:27017
+    volumes:
+      - taskForce.notify.volume:/data/db
+    networks:
+      - taskForce.task.network
+
+  taskForce.notify:
+    container_name: taskForce.notify
+    depends_on:
+      - taskForce.notify-mongodb
+      - taskForce.notify-rabbitmq
+    restart: always
+    image: taskforce.notify:latest
+    env_file:
+      - .taskForce.notify.env
+    environment:
+      - NODE_ENV=production
+    ports:
+      - 3335:3335
+    networks:
+      - taskForce.task.network
+
+  taskForce.task:
+    container_name: taskForce.task
+    depends_on:
+      - taskForce.task-postgres
+      - taskForce.notify-rabbitmq
+      - taskForce.notify
+    restart: always
+    image: taskforce.task:latest
+    env_file:
+      - .taskForce.task.env
+    ports:
+      - 3000:3000
+    networks:
+      - taskForce.task.network
+
+volumes:
+  taskForce.task.volume:
+  taskForce.notify.volume:
+
+networks:
+  taskForce.task.network:
+      driver: bridge

@@ -11,15 +11,10 @@ export class CheckUserGuard implements CanActivate {
 
   public async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-        const { data } = await this.httpService.axiosRef.post(`${ApplicationServiceURL.Auth}/check`, {}, {
-      headers: {
-        'Authorization': request.headers['authorization']
-      }
-    })
 
     const user = await this.httpService.axiosRef.get(`${ApplicationServiceURL.Comment}/${request.params.id}`);
 
-    if (user.data.userId !== data.sub) {
+    if (user.data.userId !== request.user.sub) {
       throw new NotFoundException(UserError.DeleteComment);
     }
 

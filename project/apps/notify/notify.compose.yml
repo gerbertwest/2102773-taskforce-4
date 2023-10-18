@@ -1,0 +1,47 @@
+version: '3.9'
+services:
+  taskForce.notify-rabbitmq:
+    image: rabbitmq:3.11-management
+    container_name: taskForce.notify-rabbitmq
+    ports:
+      - '1088:15672'
+      - '5672:5672'
+    env_file:
+      - .taskForce.notify.rabbit.env
+    networks:
+      - taskForce.notify.network
+
+  taskForce.notify-mongodb:
+    image: mongo:4.2
+    container_name: taskForce.notify-mongodb
+    env_file:
+      - .taskForce.notify.db.env
+    ports:
+      - 27017:27017
+    volumes:
+      - taskForce.notify.volume:/data/db
+    networks:
+      - taskForce.notify.network
+
+  taskForce.notify:
+    container_name: taskForce.notify
+    depends_on:
+      - taskForce.notify-mongodb
+      - taskForce.notify-rabbitmq
+    restart: always
+    image: taskforce.notify:latest
+    env_file:
+      - .taskForce.notify.env
+    environment:
+      - NODE_ENV=production
+    ports:
+      - 3335:3335
+    networks:
+      - taskForce.notify.network
+
+networks:
+  taskForce.notify.network:
+    driver: bridge
+
+volumes:
+  taskForce.notify.volume:
